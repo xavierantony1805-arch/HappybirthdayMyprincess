@@ -185,3 +185,71 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 <script src="effect.js"></script>
 </html>
+
+<script>
+       $(document).ready(function() {
+    // 1. Create the 'See More' button styled to match the theme
+    var $seeMoreBtn = $(
+        '<button class="btn btn-primary" id="see_more" style="display:none; margin: 10px auto; font-size: 18px; padding: 10px 28px; border-radius: 25px; box-shadow: 0 0 15px rgba(255,255,255,0.8); transition: all 0.3s ease;">' +
+        'See More &rarr;' +
+        '</button>'
+    );
+
+    // 2. Insert into the bottom navigation bar alongside the other buttons
+    var $navContainer = $('.navbar .col-md-6');
+    if ($navContainer.length) {
+        $navContainer.append($seeMoreBtn);
+    } else {
+        $seeMoreBtn.css({
+            position: 'fixed',
+            bottom: '30px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999
+        });
+        $('body').append($seeMoreBtn);
+    }
+
+    // 3. Handle redirection to page2.html on click
+    $seeMoreBtn.on('click', function() {
+        window.location.href = 'page2.html';
+    });
+
+    var storyStarted = false;
+    var lastParagraphSeen = false;
+    var buttonRevealed = false;
+
+    function showButton() {
+        if (buttonRevealed) return;
+        buttonRevealed = true;
+        setTimeout(function() {
+            $seeMoreBtn.fadeIn('slow');
+        }, 1500);
+    }
+
+    // 4. Detect when the final 'A message for you' (#story) button is clicked
+    $(document).on('click', '#story', function() {
+        storyStarted = true;
+    });
+
+    // 5. Watch for the message animation to finish completely
+    var endWatcher = setInterval(function() {
+        if (!storyStarted) return;
+
+        var $lastP = $('.message p').last();
+
+        // Check if the final paragraph has appeared
+        if ($lastP.is(':visible')) {
+            lastParagraphSeen = true;
+        }
+
+        // The sequence is complete when the last paragraph fades out or cake reappears
+        var cakeVisible = $('.cake').is(':visible') && $('.cake').css('opacity') > 0.5;
+
+        if (lastParagraphSeen && (!$lastP.is(':visible') || cakeVisible)) {
+            clearInterval(endWatcher);
+            showButton();
+        }
+    }, 500);
+});
+</script>
